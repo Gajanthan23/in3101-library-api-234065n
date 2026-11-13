@@ -1,4 +1,4 @@
-# IN3101 Lab 02 - Library API
+# IN3101 Lab 03 - Containerised Library API
 
 Gajanthan Sivaanbu | 234065N
 
@@ -12,7 +12,7 @@ Install JDK 21 and Docker Desktop (or use an existing MySQL server). From the pr
 
 ```sh
 cp .env.example .env
-# Edit .env and replace both password values.
+# Set DB_ROOT_PASSWORD in .env.
 set -a
 . ./.env
 set +a
@@ -20,9 +20,9 @@ docker compose up -d --wait
 ./mvnw spring-boot:run
 ```
 
-On Windows PowerShell, set `$env:DB_PASSWORD` and `$env:MYSQL_ROOT_PASSWORD` to the values in your local `.env`, run `docker compose up -d --wait`, then `.\mvnw.cmd spring-boot:run`.
+On Windows PowerShell, set `$env:DB_ROOT_PASSWORD` to the value in your local `.env`, then run `docker compose up -d --build --wait`.
 
-Alternatively, create `library_db` in an existing MySQL instance and set `DB_URL`, `DB_USER` and `DB_PASSWORD`. The default URL is `jdbc:mysql://localhost:3306/library_db`; the default user is `library`. Credentials are read from environment variables and are not stored in source control. Hibernate creates/updates the `book` table.
+Alternatively, create `library_db` in an existing MySQL instance and set `DB_URL`, `DB_USER` and `DB_PASSWORD` when running the API outside Compose. Hibernate creates/updates the `book` table.
 
 The application listens at `http://localhost:8080`. Swagger UI: `http://localhost:8080/swagger-ui.html`. OpenAPI JSON: `http://localhost:8080/v3/api-docs`.
 
@@ -59,11 +59,11 @@ The submission PDF and captured evidence are packaged separately from the source
 
 ```sh
 ./mvnw clean package
-# Stop the API with Ctrl+C.
-docker compose stop
+# Stop and remove the containers while retaining the named database volume.
+docker compose down
 ```
 
-The MySQL data volume persists between runs. `docker compose down` removes the container/network but retains the database volume. Use `SELECT * FROM library_db.book;` in a MySQL client to inspect stored books.
+The MySQL data volume persists between runs. Never use `docker compose down -v` for this lab. Use `SELECT * FROM library_db.book;` in a MySQL client to inspect stored books through host port `3307`.
 
 ## Reference documentation
 
